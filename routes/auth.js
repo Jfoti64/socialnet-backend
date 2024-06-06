@@ -5,7 +5,11 @@ const authController = require('../controllers/authController');
 
 // Google OAuth routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/google/callback', passport.authenticate('google', { session: false }), authController.googleCallback);
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { session: false }),
+  authController.googleCallback
+);
 
 // Success route to send the JWT token
 router.get('/success', authController.success);

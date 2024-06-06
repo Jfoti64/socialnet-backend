@@ -7,10 +7,13 @@ require('./config/passport');
 
 const app = express();
 
+const big = 10;
+
 // server.js
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.log(err));
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.log(err));
 
 // Middleware
 app.use(express.json());
@@ -22,7 +25,7 @@ app.use('/auth', authRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
-    res.send('Welcome to SocialNet API');
+  res.send('Welcome to SocialNet API');
 });
 
 // Start server
