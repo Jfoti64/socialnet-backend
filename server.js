@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import postRoutes from './routes/postRoutes.js';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use(passport.session());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
+app.use('/posts', postRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

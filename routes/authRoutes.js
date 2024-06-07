@@ -1,4 +1,3 @@
-// routes/auth.js
 import express from 'express';
 import passport from 'passport';
 import asyncHandler from 'express-async-handler';
@@ -6,21 +5,19 @@ import * as authController from '../controllers/authController.js';
 
 const router = express.Router();
 
-// Register new user
-router.post('/register', asyncHandler(authController.register));
+router
+  .post('/register', asyncHandler(authController.register)) // Register new user
+  .post('/login', authController.login); // Login user
 
-// Login user
-router.post('/login', authController.login);
+router.route('/google').get(passport.authenticate('google', { scope: ['profile', 'email'] })); // Google OAuth
 
-// Google OAuth
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router
+  .route('/google/callback')
+  .get(
+    passport.authenticate('google', { session: false, failureRedirect: '/' }),
+    authController.googleCallback
+  ); // Google OAuth callback
 
-router.get(
-  '/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: '/' }),
-  authController.googleCallback
-);
-
-router.get('/success', authController.success);
+router.route('/success').get(authController.success); // Success route
 
 export default router;

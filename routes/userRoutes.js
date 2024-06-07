@@ -10,9 +10,14 @@ import auth from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.route('/me').get(auth, getProfile).put(auth, updateProfile);
-router.post('/friend-request', auth, sendFriendRequest);
-router.post('/accept-friend-request', auth, acceptFriendRequest);
-router.post('/reject-friend-request', auth, rejectFriendRequest);
+router
+  .route('/me')
+  .get(auth, getProfile) // Get current user's profile
+  .put(auth, updateProfile); // Update current user's profile
+
+router
+  .post('/friend-request', auth, sendFriendRequest) // Send a friend request
+  .post('/accept-friend-request', auth, acceptFriendRequest) // Accept a friend request
+  .post('/reject-friend-request', auth, rejectFriendRequest); // Reject a friend request
 
 export default router;
