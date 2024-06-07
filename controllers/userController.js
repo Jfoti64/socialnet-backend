@@ -1,13 +1,22 @@
+// controllers/userController.js
 import User from '../models/User.js';
 import asyncHandler from 'express-async-handler';
 import { check, validationResult } from 'express-validator';
 
 // Get current user's profile
-export const getProfile = asyncHandler(async (req, res) => {
+export const getCurrentUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).select('-password');
   if (!user) {
-    res.status(404);
-    throw new Error('User not found');
+    return res.status(404).json({ message: 'User not found' });
+  }
+  res.json(user);
+});
+
+// Get another user's profile by ID
+export const getUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.userId).select('-password');
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
   }
   res.json(user);
 });

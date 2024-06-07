@@ -1,6 +1,7 @@
-import bcrypt from 'bcryptjs';
+import request from 'supertest';
+import app from '../server.js';
 import User from '../models/User.js';
-import { connectDB, disconnectDB, clearDB } from '../config/db.js';
+import { connectDB, disconnectDB, clearDB, createUser } from '../config/db.js';
 
 beforeAll(async () => {
   await connectDB();
@@ -14,20 +15,41 @@ afterEach(async () => {
   await clearDB();
 });
 
-describe('User model', () => {
-  it('should correctly compare passwords', async () => {
-    const user = new User({
-      name: 'Test User',
-      email: 'test@example.com',
+describe('User Profile Routes', () => {
+  let user, token;
+
+  beforeEach(async () => {
+    user = await createUser({
+      name: 'John Doe',
+      email: 'john@example.com',
       password: 'password123',
     });
 
-    await user.save();
+    const res = await request(app).post('/auth/login').send({
+      email: 'john@example.com',
+      password: 'password123',
+    });
 
-    const isMatch = await user.comparePassword('password123');
-    expect(isMatch).toBe(true);
+    token = res.body.token;
+  });
 
-    const isNotMatch = await user.comparePassword('wrongpassword');
-    expect(isNotMatch).toBe(false);
+  it('should get the current user profile', async () => {
+    const res = await request(app).get('/users/me').set('Authorization', `Bearer ${token}`);
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('name', 'John Doe');
+  });
+
+  it('should get another user profile by ID', async () => {
+    const otherUser = await createUser({
+      name: 'Jane Doe',
+      email: 'jane@example.com',
+      password: 'password123',
+    });
+
+    const res = await request(app)
+      .get(`/users/profile/${otherUser.id}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('name', 'Jane Doe');
   });
 });
