@@ -3,15 +3,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 require('dotenv').config();
-require('./config/passport');
+require('./config/passport'); // Initialize passport
 
 const app = express();
-
-// server.js
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.log(err));
 
 // Middleware
 app.use(express.json());
@@ -28,4 +22,9 @@ app.get('/', (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch((err) => console.error(err));
