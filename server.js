@@ -7,8 +7,6 @@ require('./config/passport');
 
 const app = express();
 
-const big = 10;
-
 // server.js
 mongoose
   .connect(process.env.MONGO_URI)
