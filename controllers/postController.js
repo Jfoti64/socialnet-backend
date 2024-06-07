@@ -35,8 +35,7 @@ export const getPosts = asyncHandler(async (req, res) => {
 export const getPost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id).populate('author', 'name profilePicture');
   if (!post) {
-    res.status(404).json({ message: 'Post not found' });
-    return;
+    return res.status(404).json({ message: 'Post not found' });
   }
   res.json(post);
 });
@@ -57,12 +56,10 @@ export const updatePost = [
     const { content } = req.body;
     const post = await Post.findById(req.params.id);
     if (!post) {
-      res.status(404).json({ message: 'Post not found' });
-      return;
+      return res.status(404).json({ message: 'Post not found' });
     }
     if (post.author.toString() !== req.user.id) {
-      res.status(403).json({ message: 'User not authorized' });
-      return;
+      return res.status(403).json({ message: 'User not authorized' });
     }
     post.content = content;
     const updatedPost = await post.save();
@@ -74,13 +71,11 @@ export const updatePost = [
 export const deletePost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (!post) {
-    res.status(404).json({ message: 'Post not found' });
-    return;
+    return res.status(404).json({ message: 'Post not found' });
   }
   if (post.author.toString() !== req.user.id) {
-    res.status(403).json({ message: 'User not authorized' });
-    return;
+    return res.status(403).json({ message: 'User not authorized' });
   }
-  await post.remove();
+  await Post.deleteOne({ _id: req.params.id });
   res.json({ message: 'Post removed' });
 });
