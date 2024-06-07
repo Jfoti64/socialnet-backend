@@ -1,10 +1,12 @@
-// server.js
 import express from 'express';
 import mongoose from 'mongoose';
 import passport from 'passport';
 import session from 'express-session';
 import flash from 'connect-flash';
 import dotenv from 'dotenv';
+
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 
@@ -25,8 +27,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-import authRoutes from './routes/authRoutes.js';
 app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
