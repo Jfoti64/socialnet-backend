@@ -4,6 +4,7 @@ import passport from 'passport';
 import session from 'express-session';
 import flash from 'connect-flash';
 import dotenv from 'dotenv';
+import { connectDB } from './config/db.js';
 
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';

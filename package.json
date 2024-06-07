@@ -37,7 +37,7 @@
     "start": "node ./bin/www",
     "devstart": "nodemon ./bin/www",
     "serverstart": "DEBUG=socialnet-backend:* npm run devstart",
-    "test": "jest"
+    "test": "jest --watch"
   },
   "keywords": [],
   "author": "",

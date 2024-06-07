@@ -1,30 +1,18 @@
-// tests/auth.test.js
 import request from 'supertest';
-import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import app from '../server.js';
 import { describe, beforeAll, afterAll, afterEach, it, expect } from '@jest/globals';
-
-let mongoServer;
+import { connectDB, disconnectDB, clearDB } from '../config/db.js';
+import app from '../server.js';
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-
-  await mongoose.connect(uri);
+  await connectDB();
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
+  await disconnectDB();
 });
 
 afterEach(async () => {
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    const collection = collections[key];
-    await collection.deleteMany();
-  }
+  await clearDB();
 });
 
 describe('Auth Routes', () => {
