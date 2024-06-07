@@ -20,6 +20,12 @@ app.get('/', (req, res) => {
   res.send('Welcome to SocialNet API');
 });
 
+// Error handling middleware
+app.use((err, req, res) => {
+  console.error(err.stack);
+  res.status(500).send({ message: err.message });
+});
+
 // Start server
 const PORT = process.env.PORT || 5000;
 mongoose

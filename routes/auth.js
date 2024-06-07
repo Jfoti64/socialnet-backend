@@ -2,10 +2,11 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
+const asyncHandler = require('express-async-handler');
 const authController = require('../controllers/authController');
 
 // Register new user
-router.post('/register', authController.register);
+router.post('/register', asyncHandler(authController.register));
 
 // Login user
 router.post('/login', authController.login);
