@@ -1,8 +1,7 @@
 import request from 'supertest';
 import { describe, beforeAll, beforeEach, afterAll, afterEach, it, expect } from '@jest/globals';
-import { connectDB, disconnectDB, clearDB } from '../config/db.js';
+import { connectDB, disconnectDB, clearDB, createUser } from '../config/db.js';
 import app from '../server.js';
-import User from '../models/User.js';
 
 beforeAll(async () => {
   await connectDB();
@@ -20,13 +19,18 @@ describe('Post Routes', () => {
   let user, token;
 
   beforeEach(async () => {
-    const res = await request(app).post('/auth/register').send({
+    user = await createUser({
       name: 'John Doe',
       email: 'john@example.com',
       password: 'password123',
     });
+
+    const res = await request(app).post('/auth/login').send({
+      email: 'john@example.com',
+      password: 'password123',
+    });
+
     token = res.body.token;
-    user = await User.findOne({ email: 'john@example.com' });
   });
 
   it('should create a new post', async () => {

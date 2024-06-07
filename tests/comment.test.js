@@ -19,13 +19,18 @@ describe('Comment Routes', () => {
   let user, token, postId;
 
   beforeEach(async () => {
-    const res = await request(app).post('/auth/register').send({
+    user = await createUser({
       name: 'John Doe',
       email: 'john@example.com',
       password: 'password123',
     });
+
+    const res = await request(app).post('/auth/login').send({
+      email: 'john@example.com',
+      password: 'password123',
+    });
+
     token = res.body.token;
-    user = await User.findOne({ email: 'john@example.com' });
 
     const postRes = await request(app).post('/posts').set('Authorization', `Bearer ${token}`).send({
       content: 'This is a test post',
