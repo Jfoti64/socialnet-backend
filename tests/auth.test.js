@@ -1,6 +1,5 @@
 import request from 'supertest';
 import app from '../server.js';
-import { describe, beforeAll, afterAll, afterEach, it, expect } from '@jest/globals';
 import { connectDB, disconnectDB, clearDB, createUser } from '../config/db.js';
 
 beforeAll(async () => {

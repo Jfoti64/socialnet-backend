@@ -1,4 +1,3 @@
-// eslint.config.js
 import globals from 'globals';
 import pluginJs from '@eslint/js';
 
@@ -15,4 +14,15 @@ export default [
     },
   },
   pluginJs.configs.recommended,
+  {
+    files: ['tests/**/*'],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      },
+    },
+    env: {
+      jest: true,
+    },
+  },
 ];
