@@ -3,7 +3,7 @@ import express from 'express';
 import {
   createPost,
   getPosts,
-  getPostById,
+  getPost,
   updatePost,
   deletePost,
 } from '../controllers/postController.js';
@@ -19,7 +19,7 @@ router
 
 router
   .route('/:id')
-  .get(auth, getPostById) // Get a post by ID
+  .get(auth, getPost) // Get a post by ID
   .put(auth, updatePost) // Update a post by ID
   .delete(auth, deletePost); // Delete a post by ID
 
