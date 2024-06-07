@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import asyncHandler from 'express-async-handler';
+import { check, validationResult } from 'express-validator';
 
 // Get current user's profile
 export const getProfile = asyncHandler(async (req, res) => {
@@ -12,84 +13,130 @@ export const getProfile = asyncHandler(async (req, res) => {
 });
 
 // Update user profile
-export const updateProfile = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
-  const user = await User.findById(req.user.id);
+export const updateProfile = [
+  // Validation rules
+  check('name', 'Name is required').optional().not().isEmpty(),
+  check('email', 'Please include a valid email').optional().isEmail(),
+  check('password', 'Password must be at least 6 characters').optional().isLength({ min: 6 }),
 
-  if (!user) {
-    res.status(404);
-    throw new Error('User not found');
-  }
+  // Controller logic
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-  user.name = name || user.name;
-  user.email = email || user.email;
+    const { name, email, password } = req.body;
+    const user = await User.findById(req.user.id);
 
-  if (password) {
-    user.password = password;
-  }
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
 
-  const updatedUser = await user.save();
-  res.json({
-    id: updatedUser.id,
-    name: updatedUser.name,
-    email: updatedUser.email,
-    profilePicture: updatedUser.profilePicture,
-  });
-});
+    user.name = name || user.name;
+    user.email = email || user.email;
+
+    if (password) {
+      user.password = password;
+    }
+
+    const updatedUser = await user.save();
+    res.json({
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      profilePicture: updatedUser.profilePicture,
+    });
+  }),
+];
 
 // Send friend request
-export const sendFriendRequest = asyncHandler(async (req, res) => {
-  const recipient = await User.findById(req.body.recipientId);
+export const sendFriendRequest = [
+  // Validation rules
+  check('recipientId', 'Recipient ID is required').not().isEmpty(),
 
-  if (!recipient) {
-    res.status(404);
-    throw new Error('User not found');
-  }
+  // Controller logic
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-  if (recipient.friendRequests.includes(req.user.id)) {
-    res.status(400);
-    throw new Error('Friend request already sent');
-  }
+    const recipient = await User.findById(req.body.recipientId);
 
-  recipient.friendRequests.push(req.user.id);
-  await recipient.save();
+    if (!recipient) {
+      res.status(404);
+      throw new Error('User not found');
+    }
 
-  res.json({ message: 'Friend request sent' });
-});
+    if (recipient.friendRequests.includes(req.user.id)) {
+      res.status(400);
+      throw new Error('Friend request already sent');
+    }
+
+    recipient.friendRequests.push(req.user.id);
+    await recipient.save();
+
+    res.json({ message: 'Friend request sent' });
+  }),
+];
 
 // Accept friend request
-export const acceptFriendRequest = asyncHandler(async (req, res) => {
-  const { requesterId } = req.body;
-  const user = await User.findById(req.user.id);
-  const requester = await User.findById(requesterId);
+export const acceptFriendRequest = [
+  // Validation rules
+  check('requesterId', 'Requester ID is required').not().isEmpty(),
 
-  if (!requester) {
-    res.status(404);
-    throw new Error('User not found');
-  }
+  // Controller logic
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-  user.friends.push(requesterId);
-  user.friendRequests = user.friendRequests.filter((id) => id.toString() !== requesterId);
-  requester.friends.push(req.user.id);
+    const { requesterId } = req.body;
+    const user = await User.findById(req.user.id);
+    const requester = await User.findById(requesterId);
 
-  await user.save();
-  await requester.save();
+    if (!requester) {
+      res.status(404);
+      throw new Error('User not found');
+    }
 
-  res.json({ message: 'Friend request accepted' });
-});
+    user.friends.push(requesterId);
+    user.friendRequests = user.friendRequests.filter((id) => id.toString() !== requesterId);
+    requester.friends.push(req.user.id);
+
+    await user.save();
+    await requester.save();
+
+    res.json({ message: 'Friend request accepted' });
+  }),
+];
 
 // Reject friend request
-export const rejectFriendRequest = asyncHandler(async (req, res) => {
-  const { requesterId } = req.body;
-  const user = await User.findById(req.user.id);
+export const rejectFriendRequest = [
+  // Validation rules
+  check('requesterId', 'Requester ID is required').not().isEmpty(),
 
-  if (!user) {
-    res.status(404);
-    throw new Error('User not found');
-  }
+  // Controller logic
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-  user.friendRequests = user.friendRequests.filter((id) => id.toString() !== requesterId);
-  await user.save();
+    const { requesterId } = req.body;
+    const user = await User.findById(req.user.id);
 
-  res.json({ message: 'Friend request rejected' });
-});
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    user.friendRequests = user.friendRequests.filter((id) => id.toString() !== requesterId);
+    await user.save();
+
+    res.json({ message: 'Friend request rejected' });
+  }),
+];

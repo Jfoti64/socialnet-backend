@@ -5,19 +5,19 @@ import * as authController from '../controllers/authController.js';
 
 const router = express.Router();
 
-router
-  .post('/register', asyncHandler(authController.register)) // Register new user
-  .post('/login', authController.login); // Login user
+router.post('/register', authController.register); // Register new user
+router.post('/login', asyncHandler(authController.login)); // Login user
 
-router.route('/google').get(passport.authenticate('google', { scope: ['profile', 'email'] })); // Google OAuth
+// Google OAuth
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router
-  .route('/google/callback')
-  .get(
-    passport.authenticate('google', { session: false, failureRedirect: '/' }),
-    authController.googleCallback
-  ); // Google OAuth callback
+// Google OAuth callback
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: '/' }),
+  authController.googleCallback
+);
 
-router.route('/success').get(authController.success); // Success route
+router.get('/success', authController.success); // Success route
 
 export default router;

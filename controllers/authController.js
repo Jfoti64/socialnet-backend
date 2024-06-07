@@ -1,6 +1,7 @@
-// controllers/authController.js
 import jwt from 'jsonwebtoken';
+import { check, validationResult } from 'express-validator';
 import User from '../models/User.js';
+import asyncHandler from 'express-async-handler';
 
 // Google OAuth
 export const googleCallback = (req, res) => {
@@ -13,34 +14,47 @@ export const success = (req, res) => {
 };
 
 // Register new user
-export const register = async (req, res) => {
-  const { name, email, password } = req.body;
+export const register = [
+  // Validation rules
+  check('name', 'Name is required').not().isEmpty(),
+  check('email', 'Please include a valid email').isEmail(),
+  check('password', 'Password must be at least 6 characters').isLength({ min: 6 }),
 
-  try {
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ msg: 'User already exists' });
+  // Controller logic
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    user = new User({
-      name,
-      email,
-      password,
-    });
+    const { name, email, password } = req.body;
 
-    await user.save();
+    try {
+      let user = await User.findOne({ email });
+      if (user) {
+        return res.status(400).json({ msg: 'User already exists' });
+      }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      user = new User({
+        name,
+        email,
+        password,
+      });
 
-    res.json({ token });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
-};
+      await user.save();
+
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+      res.json({ token });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+    }
+  }),
+];
 
 // Login user
-export const login = async (req, res) => {
+export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -61,4 +75,4 @@ export const login = async (req, res) => {
     console.error(err.message);
     res.status(500).send('Server error');
   }
-};
+});
