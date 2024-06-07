@@ -25,7 +25,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-import authRoutes from './routes/auth.js';
+import authRoutes from './routes/authRoutes.js';
 app.use('/auth', authRoutes);
 
 // Basic route
