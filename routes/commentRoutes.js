@@ -1,11 +1,15 @@
-// routes/commentRoutes.js
 import express from 'express';
-import { addComment, updateComment, deleteComment } from '../controllers/commentController.js';
+import {
+  addComment,
+  updateComment,
+  deleteComment,
+  getComments,
+} from '../controllers/commentController.js';
 import auth from '../middleware/auth.js';
 
 const router = express.Router({ mergeParams: true });
 
-router.route('/').post(auth, addComment); // Add a comment to a post
+router.route('/').post(auth, addComment).get(auth, getComments); // Add and get comments for a post
 
 router
   .route('/:commentId')

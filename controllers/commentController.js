@@ -1,4 +1,3 @@
-// controllers/commentController.js
 import Post from '../models/Post.js';
 import asyncHandler from 'express-async-handler';
 import { check, validationResult } from 'express-validator';
@@ -26,9 +25,18 @@ export const addComment = [
     post.comments.push(comment);
     await post.save();
 
-    res.status(201).json(post);
+    res.status(201).json(comment);
   }),
 ];
+
+// Get all comments
+export const getComments = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.postId).populate('comments.author', 'name');
+  if (!post) {
+    return res.status(404).json({ message: 'Post not found' });
+  }
+  res.json(post.comments);
+});
 
 // Update a comment
 export const updateComment = [
@@ -57,7 +65,7 @@ export const updateComment = [
     comment.content = req.body.content;
     await post.save();
 
-    res.json(post);
+    res.json(comment);
   }),
 ];
 
@@ -80,5 +88,5 @@ export const deleteComment = asyncHandler(async (req, res) => {
   comment.remove();
   await post.save();
 
-  res.json(post);
+  res.json({ message: 'Comment removed' });
 });
