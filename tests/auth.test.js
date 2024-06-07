@@ -1,7 +1,7 @@
 import request from 'supertest';
-import { describe, beforeAll, afterAll, afterEach, it, expect } from '@jest/globals';
-import { connectDB, disconnectDB, clearDB } from '../config/db.js';
 import app from '../server.js';
+import { describe, beforeAll, afterAll, afterEach, it, expect } from '@jest/globals';
+import { connectDB, disconnectDB, clearDB, createUser } from '../config/db.js';
 
 beforeAll(async () => {
   await connectDB();
@@ -27,6 +27,12 @@ describe('Auth Routes', () => {
   });
 
   it('should login an existing user', async () => {
+    await createUser({
+      name: 'John Doe',
+      email: 'john@example.com',
+      password: 'password123',
+    });
+
     const res = await request(app).post('/auth/login').send({
       email: 'john@example.com',
       password: 'password123',
@@ -36,7 +42,7 @@ describe('Auth Routes', () => {
   });
 
   it('should fail to register a user with an existing email', async () => {
-    await request(app).post('/auth/register').send({
+    await createUser({
       name: 'John Doe',
       email: 'john@example.com',
       password: 'password123',

@@ -39,5 +39,58 @@ describe('Post Routes', () => {
     expect(res.body).toHaveProperty('author', user.id);
   });
 
-  // Add more tests for get, update, delete, etc.
+  it('should get all posts', async () => {
+    await request(app).post('/posts').set('Authorization', `Bearer ${token}`).send({
+      content: 'This is a test post',
+    });
+
+    const res = await request(app).get('/posts').set('Authorization', `Bearer ${token}`);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toHaveProperty('content', 'This is a test post');
+  });
+
+  it('should get a post by ID', async () => {
+    const postRes = await request(app).post('/posts').set('Authorization', `Bearer ${token}`).send({
+      content: 'This is a test post',
+    });
+
+    const postId = postRes.body._id;
+    const res = await request(app).get(`/posts/${postId}`).set('Authorization', `Bearer ${token}`);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('content', 'This is a test post');
+  });
+
+  it('should update a post', async () => {
+    const postRes = await request(app).post('/posts').set('Authorization', `Bearer ${token}`).send({
+      content: 'This is a test post',
+    });
+
+    const postId = postRes.body._id;
+    const res = await request(app)
+      .put(`/posts/${postId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        content: 'Updated post content',
+      });
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('content', 'Updated post content');
+  });
+
+  it('should delete a post', async () => {
+    const postRes = await request(app).post('/posts').set('Authorization', `Bearer ${token}`).send({
+      content: 'This is a test post',
+    });
+
+    const postId = postRes.body._id;
+    const res = await request(app)
+      .delete(`/posts/${postId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('message', 'Post removed');
+  });
 });
