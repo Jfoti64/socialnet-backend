@@ -1,7 +1,8 @@
 // routes/users.js
-const express = require('express');
-const User = require('../models/User');
-const auth = require('../middleware/auth');
+import express from 'express';
+import User from '../models/User.js';
+import auth from '../middleware/auth.js';
+
 const router = express.Router();
 
 router.get('/me', auth, async (req, res) => {
@@ -9,4 +10,4 @@ router.get('/me', auth, async (req, res) => {
   res.send(user);
 });
 
-module.exports = router;
+export default router;

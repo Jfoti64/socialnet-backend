@@ -1,5 +1,5 @@
-// models/Post.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const PostSchema = new mongoose.Schema(
   {
     content: { type: String, required: true, maxLength: 2000 },
@@ -16,4 +16,5 @@ const PostSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Post', PostSchema);
+const Post = mongoose.model('Post', PostSchema);
+export default Post;

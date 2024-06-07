@@ -1,9 +1,10 @@
 // routes/auth.js
-const express = require('express');
+import express from 'express';
+import passport from 'passport';
+import asyncHandler from 'express-async-handler';
+import * as authController from '../controllers/authController.js';
+
 const router = express.Router();
-const passport = require('passport');
-const asyncHandler = require('express-async-handler');
-const authController = require('../controllers/authController');
 
 // Register new user
 router.post('/register', asyncHandler(authController.register));
@@ -22,4 +23,4 @@ router.get(
 
 router.get('/success', authController.success);
 
-module.exports = router;
+export default router;
