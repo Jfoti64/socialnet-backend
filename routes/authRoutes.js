@@ -1,12 +1,11 @@
 import express from 'express';
 import passport from 'passport';
-import asyncHandler from 'express-async-handler';
 import * as authController from '../controllers/authController.js';
 
 const router = express.Router();
 
 router.post('/register', authController.register); // Register new user
-router.post('/login', asyncHandler(authController.login)); // Login user
+router.post('/login', authController.login); // Login user
 
 // Google OAuth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
