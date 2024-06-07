@@ -40,6 +40,23 @@ describe('Auth Routes', () => {
     expect(res.body).toHaveProperty('token');
   });
 
+  it('should fail to login with invalid email', async () => {
+    const res = await request(app).post('/auth/login').send({
+      email: 'invalidemail',
+      password: 'password123',
+    });
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.errors[0].msg).toEqual('Please include a valid email');
+  });
+
+  it('should fail to login with missing password', async () => {
+    const res = await request(app).post('/auth/login').send({
+      email: 'john@example.com',
+    });
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.errors[0].msg).toEqual('Password is required');
+  });
+
   it('should fail to register a user with an existing email', async () => {
     await createUser({
       name: 'John Doe',

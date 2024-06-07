@@ -89,8 +89,6 @@ describe('Post Routes', () => {
       .delete(`/posts/${postId}`)
       .set('Authorization', `Bearer ${token}`);
 
-    console.log(res.body); // Log the response body
-
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('message', 'Post removed');
   });
