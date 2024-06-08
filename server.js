@@ -20,11 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // CORS configuration
-const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Replace with your frontend URL
-  optionsSuccessStatus: 200,
-};
-app.use(cors(corsOptions));
+app.use(cors());
 
 // Helmet configuration
 app.use(helmet());
