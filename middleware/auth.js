@@ -1,17 +1,27 @@
-// auth.js
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
+import winston from 'winston';
+
+// Configure Winston logger
+const logger = winston.createLogger({
+  level: 'error',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.Console(),
+    // Add more transports like File or HTTP if needed
+  ],
+});
 
 const auth = asyncHandler(async (req, res, next) => {
   const authHeader = req.header('Authorization');
   if (!authHeader) {
-    console.error('No Authorization header provided');
+    logger.error('No Authorization header provided');
     return res.status(401).send({ error: 'Access denied' });
   }
 
   const token = authHeader.replace('Bearer ', '');
   if (!token) {
-    console.error('No token provided');
+    logger.error('No token provided');
     return res.status(401).send({ error: 'Access denied' });
   }
 
@@ -20,7 +30,7 @@ const auth = asyncHandler(async (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
-    console.error('Invalid token', err);
+    logger.error('Invalid token', { error: err.message });
     res.status(400).send({ error: 'Invalid token' });
   }
 });
