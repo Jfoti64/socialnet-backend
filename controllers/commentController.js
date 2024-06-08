@@ -1,3 +1,4 @@
+// controllers/commentController.js
 import Post from '../models/Post.js';
 import asyncHandler from 'express-async-handler';
 import { check, validationResult } from 'express-validator';
@@ -25,7 +26,8 @@ export const addComment = [
     post.comments.push(comment);
     await post.save();
 
-    res.status(201).json(comment);
+    const addedComment = post.comments[post.comments.length - 1];
+    res.status(201).json(addedComment);
   }),
 ];
 
