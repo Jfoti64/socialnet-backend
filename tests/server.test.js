@@ -34,26 +34,30 @@ describe('Middleware and Routes', () => {
       .post('/auth/register')
       .send({ name: 'Test', email: 'test@example.com', password: 'password123' });
     expect(res.statusCode).not.toBe(500);
+    expect(res.body).toHaveProperty('token');
   });
 
   it('should mount auth routes', async () => {
     const res = await request(app).get('/auth/login');
-    console.log(res.body); // Add logging to see the response body
     expect([200, 400, 404]).toContain(res.statusCode);
     if (res.statusCode === 200) {
-      expect(res.body).toHaveProperty('loginPage', true); // Example property
+      expect(res.body).toHaveProperty('loginPage', true);
     }
   });
 
   it('should mount user routes', async () => {
     const res = await request(app).get('/users/me');
-    console.log(res.body); // Add logging
     expect([401, 500]).toContain(res.statusCode);
+    if (res.statusCode === 401) {
+      expect(res.body).toHaveProperty('error', 'Access denied');
+    }
   });
 
   it('should mount post routes', async () => {
     const res = await request(app).get('/posts');
-    console.log(res.body); // Add logging
     expect([200, 401, 500]).toContain(res.statusCode);
+    if (res.statusCode === 200) {
+      expect(res.body).toBeInstanceOf(Array);
+    }
   });
 });
