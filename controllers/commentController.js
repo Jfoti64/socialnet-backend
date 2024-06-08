@@ -1,4 +1,5 @@
 // controllers/commentController.js
+import Comment from '../models/Comment.js';
 import Post from '../models/Post.js';
 import asyncHandler from 'express-async-handler';
 import { check, validationResult } from 'express-validator';
@@ -18,26 +19,22 @@ export const addComment = [
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    const comment = {
+    const comment = new Comment({
       content: req.body.content,
       author: req.user.id,
-    };
+      post: req.params.postId,
+    });
 
-    post.comments.push(comment);
-    await post.save();
+    await comment.save();
 
-    const addedComment = post.comments[post.comments.length - 1];
-    res.status(201).json(addedComment);
+    res.status(201).json(comment);
   }),
 ];
 
-// Get all comments
+// Get all comments for a post
 export const getComments = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.postId).populate('comments.author', 'name');
-  if (!post) {
-    return res.status(404).json({ message: 'Post not found' });
-  }
-  res.json(post.comments);
+  const comments = await Comment.find({ post: req.params.postId }).populate('author', 'name');
+  res.json(comments);
 });
 
 // Update a comment
@@ -50,12 +47,7 @@ export const updateComment = [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const post = await Post.findById(req.params.postId);
-    if (!post) {
-      return res.status(404).json({ message: 'Post not found' });
-    }
-
-    const comment = post.comments.id(req.params.commentId);
+    const comment = await Comment.findById(req.params.commentId);
     if (!comment) {
       return res.status(404).json({ message: 'Comment not found' });
     }
@@ -65,7 +57,7 @@ export const updateComment = [
     }
 
     comment.content = req.body.content;
-    await post.save();
+    await comment.save();
 
     res.json(comment);
   }),
@@ -73,12 +65,7 @@ export const updateComment = [
 
 // Delete a comment
 export const deleteComment = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.postId);
-  if (!post) {
-    return res.status(404).json({ message: 'Post not found' });
-  }
-
-  const comment = post.comments.id(req.params.commentId);
+  const comment = await Comment.findById(req.params.commentId);
   if (!comment) {
     return res.status(404).json({ message: 'Comment not found' });
   }
@@ -87,8 +74,7 @@ export const deleteComment = asyncHandler(async (req, res) => {
     return res.status(403).json({ message: 'User not authorized' });
   }
 
-  comment.remove();
-  await post.save();
+  await comment.deleteOne();
 
   res.json({ message: 'Comment removed' });
 });
