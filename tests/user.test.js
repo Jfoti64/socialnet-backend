@@ -1,7 +1,6 @@
-import request from 'supertest';
-import app from '../server.js';
-import User from '../models/User.js';
+// tests/userModel.test.js
 import { connectDB, disconnectDB, clearDB, createUser } from '../config/db.js';
+import User from '../models/User.js';
 
 beforeAll(async () => {
   await connectDB();
@@ -15,41 +14,84 @@ afterEach(async () => {
   await clearDB();
 });
 
-describe('User Profile Routes', () => {
-  let user, token;
-
-  beforeEach(async () => {
-    user = await createUser({
+describe('User model', () => {
+  it('should hash the password before saving', async () => {
+    const user = new User({
       name: 'John Doe',
       email: 'john@example.com',
       password: 'password123',
     });
 
-    const res = await request(app).post('/auth/login').send({
+    await user.save();
+    expect(user.password).not.toBe('password123');
+  });
+
+  it('should compare passwords correctly', async () => {
+    const user = new User({
+      name: 'John Doe',
       email: 'john@example.com',
       password: 'password123',
     });
 
-    token = res.body.token;
+    await user.save();
+    const isMatch = await user.comparePassword('password123');
+    expect(isMatch).toBe(true);
+
+    const isNotMatch = await user.comparePassword('wrongpassword');
+    expect(isNotMatch).toBe(false);
   });
 
-  it('should get the current user profile', async () => {
-    const res = await request(app).get('/users/me').set('Authorization', `Bearer ${token}`);
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('name', 'John Doe');
+  it('should enforce unique email constraint', async () => {
+    const user1 = new User({
+      name: 'John Doe',
+      email: 'john@example.com',
+      password: 'password123',
+    });
+
+    await user1.save();
+
+    const user2 = new User({
+      name: 'Jane Doe',
+      email: 'john@example.com',
+      password: 'password123',
+    });
+
+    let err;
+    try {
+      await user2.save();
+    } catch (error) {
+      err = error;
+    }
+
+    expect(err).toBeDefined();
+    expect(err.code).toBe(11000); // Mongoose duplicate key error code
   });
 
-  it('should get another user profile by ID', async () => {
-    const otherUser = await createUser({
+  it('should handle friends and friendRequests correctly', async () => {
+    const user1 = await createUser({
+      name: 'John Doe',
+      email: 'john1@example.com',
+      password: 'password123',
+    });
+    const user2 = await createUser({
       name: 'Jane Doe',
       email: 'jane@example.com',
       password: 'password123',
     });
 
-    const res = await request(app)
-      .get(`/users/profile/${otherUser.id}`)
-      .set('Authorization', `Bearer ${token}`);
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('name', 'Jane Doe');
+    user1.friends.push(user2._id);
+    user2.friendRequests.push(user1._id);
+
+    await user1.save();
+    await user2.save();
+
+    const updatedUser1 = await User.findById(user1._id).populate('friends');
+    const updatedUser2 = await User.findById(user2._id).populate('friendRequests');
+
+    expect(updatedUser1.friends).toHaveLength(1);
+    expect(updatedUser1.friends[0]._id.toString()).toBe(user2._id.toString());
+
+    expect(updatedUser2.friendRequests).toHaveLength(1);
+    expect(updatedUser2.friendRequests[0]._id.toString()).toBe(user1._id.toString());
   });
 });
