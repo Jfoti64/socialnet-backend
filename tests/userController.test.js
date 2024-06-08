@@ -20,7 +20,8 @@ describe('User Profile Routes', () => {
 
   beforeEach(async () => {
     user = await createUser({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
     });
@@ -36,12 +37,14 @@ describe('User Profile Routes', () => {
   it('should get the current user profile', async () => {
     const res = await request(app).get('/users/me').set('Authorization', `Bearer ${token}`);
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('name', 'John Doe');
+    expect(res.body).toHaveProperty('firstName', 'John');
+    expect(res.body).toHaveProperty('lastName', 'Doe');
   });
 
   it('should get another user profile by ID', async () => {
     const otherUser = await createUser({
-      name: 'Jane Doe',
+      firstName: 'Jane',
+      lastName: 'Doe',
       email: 'jane@example.com',
       password: 'password123',
     });
@@ -50,6 +53,7 @@ describe('User Profile Routes', () => {
       .get(`/users/profile/${otherUser.id}`)
       .set('Authorization', `Bearer ${token}`);
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('name', 'Jane Doe');
+    expect(res.body).toHaveProperty('firstName', 'Jane');
+    expect(res.body).toHaveProperty('lastName', 'Doe');
   });
 });

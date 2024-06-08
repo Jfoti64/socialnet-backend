@@ -1,4 +1,3 @@
-// tests/comment.test.js
 import request from 'supertest';
 import app from '../server.js';
 import User from '../models/User.js';
@@ -20,7 +19,8 @@ let user, token, postId, commentId, secondCommentId, otherUserToken;
 
 beforeEach(async () => {
   user = await createUser({
-    name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
     email: 'john@example.com',
     password: 'password123',
   });
@@ -54,7 +54,8 @@ beforeEach(async () => {
   secondCommentId = secondCommentRes.body._id;
 
   const otherUser = await createUser({
-    name: 'Jane Doe',
+    firstName: 'Jane',
+    lastName: 'Doe',
     email: 'jane@example.com',
     password: 'password123',
   });

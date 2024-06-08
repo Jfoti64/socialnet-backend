@@ -17,7 +17,8 @@ afterEach(async () => {
 describe('Auth Routes', () => {
   it('should register a new user', async () => {
     const res = await request(app).post('/auth/register').send({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
     });
@@ -27,7 +28,8 @@ describe('Auth Routes', () => {
 
   it('should login an existing user', async () => {
     await createUser({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
     });
@@ -59,13 +61,15 @@ describe('Auth Routes', () => {
 
   it('should fail to register a user with an existing email', async () => {
     await createUser({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
     });
 
     const res = await request(app).post('/auth/register').send({
-      name: 'Jane Doe',
+      firstName: 'Jane',
+      lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
     });

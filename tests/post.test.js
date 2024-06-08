@@ -20,7 +20,8 @@ describe('Post Routes', () => {
 
   beforeEach(async () => {
     user = await createUser({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
     });

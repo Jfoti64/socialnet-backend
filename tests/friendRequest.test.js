@@ -1,4 +1,3 @@
-// tests/friendRequest.test.js
 import request from 'supertest';
 import app from '../server.js';
 import User from '../models/User.js';
@@ -21,13 +20,15 @@ describe('Friend Request Routes', () => {
 
   beforeEach(async () => {
     user1 = await createUser({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john1@example.com',
       password: 'password123',
     });
 
     user2 = await createUser({
-      name: 'Jane Doe',
+      firstName: 'Jane',
+      lastName: 'Doe',
       email: 'jane@example.com',
       password: 'password123',
     });

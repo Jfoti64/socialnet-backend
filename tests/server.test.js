@@ -1,4 +1,3 @@
-// tests/server.test.js
 import request from 'supertest';
 import app from '../server.js';
 import { connectDB, disconnectDB, clearDB } from '../config/db.js';
@@ -32,7 +31,12 @@ describe('Middleware and Routes', () => {
   it('should use JSON middleware', async () => {
     const res = await request(app)
       .post('/auth/register')
-      .send({ name: 'Test', email: 'test@example.com', password: 'password123' });
+      .send({
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test@example.com',
+        password: 'password123',
+      });
     expect(res.statusCode).not.toBe(500);
     expect(res.body).toHaveProperty('token');
   });

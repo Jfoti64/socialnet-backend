@@ -16,7 +16,8 @@ export const success = (req, res) => {
 // Register new user
 export const register = [
   // Validation rules
-  check('name', 'Name is required').not().isEmpty(),
+  check('firstName', 'First name is required').not().isEmpty(),
+  check('lastName', 'Last name is required').not().isEmpty(),
   check('email', 'Please include a valid email').isEmail(),
   check('password', 'Password must be at least 6 characters').isLength({ min: 6 }),
 
@@ -27,7 +28,7 @@ export const register = [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
     let user = await User.findOne({ email });
     if (user) {
@@ -35,7 +36,8 @@ export const register = [
     }
 
     user = new User({
-      name,
+      firstName,
+      lastName,
       email,
       password,
     });

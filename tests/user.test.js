@@ -1,4 +1,3 @@
-// tests/userModel.test.js
 import { connectDB, disconnectDB, clearDB, createUser } from '../config/db.js';
 import User from '../models/User.js';
 
@@ -17,7 +16,8 @@ afterEach(async () => {
 describe('User model', () => {
   it('should hash the password before saving', async () => {
     const user = new User({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
     });
@@ -28,7 +28,8 @@ describe('User model', () => {
 
   it('should compare passwords correctly', async () => {
     const user = new User({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
     });
@@ -43,7 +44,8 @@ describe('User model', () => {
 
   it('should enforce unique email constraint', async () => {
     const user1 = new User({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
     });
@@ -51,7 +53,8 @@ describe('User model', () => {
     await user1.save();
 
     const user2 = new User({
-      name: 'Jane Doe',
+      firstName: 'Jane',
+      lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
     });
@@ -69,12 +72,14 @@ describe('User model', () => {
 
   it('should handle friends and friendRequests correctly', async () => {
     const user1 = await createUser({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john1@example.com',
       password: 'password123',
     });
     const user2 = await createUser({
-      name: 'Jane Doe',
+      firstName: 'Jane',
+      lastName: 'Doe',
       email: 'jane@example.com',
       password: 'password123',
     });
