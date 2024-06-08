@@ -7,11 +7,12 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
 
+dotenv.config(); // Ensure this is at the very top
+
+import './config/passport.js'; // Ensure this is imported after dotenv.config()
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
-
-dotenv.config();
 
 const app = express();
 
@@ -27,9 +28,10 @@ app.use(helmet());
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'your_secret_key',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production' }, // Ensure cookies are secure in production
   })
 );
 app.use(flash());

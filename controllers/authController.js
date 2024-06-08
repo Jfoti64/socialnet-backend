@@ -6,7 +6,7 @@ import asyncHandler from 'express-async-handler';
 // Google OAuth
 export const googleCallback = (req, res) => {
   const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  res.redirect(`/auth/success?token=${token}`);
+  res.redirect(`${process.env.FRONTEND_URL}/auth/success?token=${token}`);
 };
 
 export const success = (req, res) => {
