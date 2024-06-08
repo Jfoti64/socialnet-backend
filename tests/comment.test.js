@@ -100,4 +100,39 @@ describe('Comment Routes', () => {
     expect(postRes.statusCode).toEqual(200);
     expect(postRes.body).toHaveLength(1); // since one comment was removed
   });
+
+  it('should not create a comment with empty content', async () => {
+    const res = await request(app)
+      .post(`/posts/${postId}/comments`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        content: '',
+      });
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.errors).toBeDefined();
+  });
+
+  it('should not update a comment without authorization', async () => {
+    const newUser = await createUser({
+      name: 'New User',
+      email: 'newuser@example.com',
+      password: 'password123',
+    });
+
+    const newRes = await request(app).post('/auth/login').send({
+      email: 'newuser@example.com',
+      password: 'password123',
+    });
+
+    const newToken = newRes.body.token;
+
+    const res = await request(app)
+      .put(`/posts/${postId}/comments/${commentId}`)
+      .set('Authorization', `Bearer ${newToken}`)
+      .send({
+        content: 'Updated content without authorization',
+      });
+    expect(res.statusCode).toEqual(403);
+    expect(res.body.message).toBe('User not authorized');
+  });
 });
