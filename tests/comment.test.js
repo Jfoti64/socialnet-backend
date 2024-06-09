@@ -87,7 +87,7 @@ describe('Comment Routes', () => {
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveLength(2);
-    expect(res.body[0]).toHaveProperty('content', 'This is a test comment');
+    expect(res.body[0]).toHaveProperty('content', 'This is a second test comment');
   });
 
   it('should update a comment', async () => {

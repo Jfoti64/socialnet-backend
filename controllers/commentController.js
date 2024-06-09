@@ -33,7 +33,9 @@ export const addComment = [
 
 // Get all comments for a post
 export const getComments = asyncHandler(async (req, res) => {
-  const comments = await Comment.find({ post: req.params.postId }).populate('author', 'name');
+  const comments = await Comment.find({ post: req.params.postId })
+    .populate('author', 'firstName lastName profilePicture')
+    .sort({ createdAt: -1 });
   res.json(comments);
 });
 

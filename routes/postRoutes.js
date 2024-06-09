@@ -9,6 +9,7 @@ import {
   getFeedPosts,
 } from '../controllers/postController.js';
 import auth from '../middleware/auth.js';
+import commentRoutes from './commentRoutes.js';
 
 const router = express.Router();
 
@@ -24,5 +25,8 @@ router
   .get(auth, getPost) // Get a post by ID
   .put(auth, updatePost) // Update a post by ID
   .delete(auth, deletePost); // Delete a post by ID
+
+// Nest comment routes under posts
+router.use('/:postId/comments', commentRoutes);
 
 export default router;
