@@ -29,7 +29,9 @@ export const createPost = [
 
 // Get all posts
 export const getPosts = asyncHandler(async (req, res) => {
-  const posts = await Post.find().populate('author', 'name profilePicture').sort({ createdAt: -1 });
+  const posts = await Post.find()
+    .populate('author', 'firstName lastName profilePicture')
+    .sort({ createdAt: -1 });
   res.json(posts);
 });
 
@@ -49,7 +51,7 @@ export const getFeedPosts = asyncHandler(async (req, res) => {
 
   // Find posts authored by the user or their friends
   const posts = await Post.find({ author: { $in: friendsIds } })
-    .populate('author', 'name profilePicture')
+    .populate('author', 'firstName lastName profilePicture')
     .sort({ createdAt: -1 });
 
   res.json(posts);
@@ -57,7 +59,10 @@ export const getFeedPosts = asyncHandler(async (req, res) => {
 
 // Get a single post
 export const getPost = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id).populate('author', 'name profilePicture');
+  const post = await Post.findById(req.params.id).populate(
+    'author',
+    'firstName lastName profilePicture'
+  );
   if (!post) {
     return res.status(404).json({ message: 'Post not found' });
   }
