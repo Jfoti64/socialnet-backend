@@ -1,4 +1,6 @@
+// src/controllers/postController.js
 import Post from '../models/Post.js';
+import User from '../models/User.js';
 import asyncHandler from 'express-async-handler';
 import { check, validationResult } from 'express-validator';
 
@@ -28,6 +30,28 @@ export const createPost = [
 // Get all posts
 export const getPosts = asyncHandler(async (req, res) => {
   const posts = await Post.find().populate('author', 'name profilePicture').sort({ createdAt: -1 });
+  res.json(posts);
+});
+
+// Get all posts by self or friends
+export const getFeedPosts = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  // Find the user and populate their friends list
+  const user = await User.findById(userId).populate('friends', '_id');
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  // Collect the IDs of the user and their friends
+  const friendsIds = user.friends.map((friend) => friend._id);
+  friendsIds.push(userId);
+
+  // Find posts authored by the user or their friends
+  const posts = await Post.find({ author: { $in: friendsIds } })
+    .populate('author', 'name profilePicture')
+    .sort({ createdAt: -1 });
+
   res.json(posts);
 });
 

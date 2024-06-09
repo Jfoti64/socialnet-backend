@@ -21,7 +21,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // CORS configuration
-app.use(cors());
+const corsOptions = {
+  origin: process.env.FRONTEND_URL, // Update this to your frontend's origin
+  credentials: true, // Allow credentials
+};
+
+app.use(cors(corsOptions));
 
 // Helmet configuration
 app.use(helmet());
