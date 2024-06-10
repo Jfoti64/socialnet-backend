@@ -1,4 +1,3 @@
-// src/routes/userRoutes.js
 import express from 'express';
 import {
   getCurrentUserProfile,
@@ -8,6 +7,7 @@ import {
   acceptFriendRequest,
   rejectFriendRequest,
   getFriendRequests,
+  searchUsers,
 } from '../controllers/userController.js';
 import auth from '../middleware/auth.js';
 
@@ -27,5 +27,7 @@ router.post('/accept-friend-request', auth, acceptFriendRequest); // Accept a fr
 router.post('/reject-friend-request', auth, rejectFriendRequest); // Reject a friend request
 
 router.get('/friend-requests', auth, getFriendRequests); // Get incoming friend requests
+
+router.get('/search', auth, searchUsers); // Search users
 
 export default router;

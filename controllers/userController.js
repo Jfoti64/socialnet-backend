@@ -174,3 +174,18 @@ export const getFriendRequests = asyncHandler(async (req, res) => {
 
   res.json(friendRequests);
 });
+
+// Search users by name or email
+export const searchUsers = asyncHandler(async (req, res) => {
+  const searchTerm = req.query.q;
+  if (!searchTerm) {
+    return res.status(400).json({ message: 'Search term is required' });
+  }
+
+  const searchRegex = new RegExp(searchTerm, 'i'); // Case-insensitive search
+  const users = await User.find({
+    $or: [{ firstName: searchRegex }, { lastName: searchRegex }, { email: searchRegex }],
+  }).select('firstName lastName email profilePicture');
+
+  res.json(users);
+});
