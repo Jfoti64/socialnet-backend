@@ -133,10 +133,7 @@ export const acceptFriendRequest = [
     await user.save();
     await requester.save();
 
-    await FriendRequest.findOneAndUpdate(
-      { requester: requesterId, recipient: req.user.id },
-      { status: 'accepted' }
-    );
+    await FriendRequest.findOneAndDelete({ requester: requesterId, recipient: req.user.id });
 
     res.json({ message: 'Friend request accepted' });
   }),
@@ -158,10 +155,12 @@ export const rejectFriendRequest = [
       return res.status(404).json({ message: 'User not found' });
     }
 
-    await FriendRequest.findOneAndUpdate(
-      { requester: requesterId, recipient: req.user.id },
-      { status: 'rejected' }
-    );
+    await FriendRequest.findOneAndDelete({ requester: requesterId, recipient: req.user.id });
+
+    // Remove the requester's ID from the recipient's friendRequests array
+    user.friendRequests = user.friendRequests.filter((id) => id.toString() !== requesterId);
+
+    await user.save();
 
     res.json({ message: 'Friend request rejected' });
   }),
@@ -171,7 +170,6 @@ export const rejectFriendRequest = [
 export const getFriendRequests = asyncHandler(async (req, res) => {
   const friendRequests = await FriendRequest.find({
     recipient: req.user.id,
-    status: 'pending',
   }).populate('requester', 'firstName lastName profilePicture');
 
   res.json(friendRequests);
