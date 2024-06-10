@@ -75,6 +75,13 @@ export const sendFriendRequest = [
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const requester = await User.findById(req.user.id);
+
+    // Check if they are already friends
+    if (requester.friends.includes(recipient._id)) {
+      return res.status(400).json({ message: 'You are already friends with this user' });
+    }
+
     const existingRequest = await FriendRequest.findOne({
       requester: req.user.id,
       recipient: req.body.recipientId,
