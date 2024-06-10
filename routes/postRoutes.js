@@ -7,6 +7,7 @@ import {
   updatePost,
   deletePost,
   getFeedPosts,
+  toggleLike,
 } from '../controllers/postController.js';
 import auth from '../middleware/auth.js';
 import commentRoutes from './commentRoutes.js';
@@ -25,6 +26,8 @@ router
   .get(auth, getPost) // Get a post by ID
   .put(auth, updatePost) // Update a post by ID
   .delete(auth, deletePost); // Delete a post by ID
+
+router.route('/:id/toggle-like').post(auth, toggleLike); // Toggle like on a post
 
 // Nest comment routes under posts
 router.use('/:postId/comments', commentRoutes);

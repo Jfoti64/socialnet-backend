@@ -54,7 +54,13 @@ export const getFeedPosts = asyncHandler(async (req, res) => {
     .populate('author', 'firstName lastName profilePicture')
     .sort({ createdAt: -1 });
 
-  res.json(posts);
+  // Add a field to each post to indicate if the current user liked it
+  const postsWithLikeStatus = posts.map((post) => ({
+    ...post.toObject(),
+    isLiked: post.likes.includes(userId),
+  }));
+
+  res.json(postsWithLikeStatus);
 });
 
 // Get a single post
@@ -107,4 +113,30 @@ export const deletePost = asyncHandler(async (req, res) => {
   }
   await Post.deleteOne({ _id: req.params.id });
   res.json({ message: 'Post removed' });
+});
+
+// Add or remove a like from a post
+export const toggleLike = asyncHandler(async (req, res) => {
+  const postId = req.params.id;
+  const userId = req.user.id;
+
+  const post = await Post.findById(postId);
+  if (!post) {
+    return res.status(404).json({ message: 'Post not found' });
+  }
+
+  // Check if the user has already liked the post
+  const isLiked = post.likes.includes(userId);
+
+  if (isLiked) {
+    // Remove the like
+    post.likes = post.likes.filter((like) => like.toString() !== userId);
+  } else {
+    // Add the like
+    post.likes.push(userId);
+  }
+
+  await post.save();
+
+  res.status(200).json(post);
 });
