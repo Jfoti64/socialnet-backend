@@ -1,7 +1,8 @@
-// controllers/userController.js
+// src/controllers/userController.js
 import User from '../models/User.js';
 import asyncHandler from 'express-async-handler';
 import { check, validationResult } from 'express-validator';
+import FriendRequest from '../models/FriendRequest.js';
 
 // Get current user's profile
 export const getCurrentUserProfile = asyncHandler(async (req, res) => {
@@ -62,10 +63,7 @@ export const updateProfile = [
 
 // Send friend request
 export const sendFriendRequest = [
-  // Validation rules
   check('recipientId', 'Recipient ID is required').not().isEmpty(),
-
-  // Controller logic
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -73,17 +71,27 @@ export const sendFriendRequest = [
     }
 
     const recipient = await User.findById(req.body.recipientId);
-
     if (!recipient) {
-      res.status(404);
-      throw new Error('User not found');
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    if (recipient.friendRequests.includes(req.user.id)) {
-      res.status(400);
-      throw new Error('Friend request already sent');
+    const existingRequest = await FriendRequest.findOne({
+      requester: req.user.id,
+      recipient: req.body.recipientId,
+    });
+
+    if (existingRequest) {
+      return res.status(400).json({ message: 'Friend request already sent' });
     }
 
+    const friendRequest = new FriendRequest({
+      requester: req.user.id,
+      recipient: req.body.recipientId,
+    });
+
+    await friendRequest.save();
+
+    // Update the recipient's friendRequests array
     recipient.friendRequests.push(req.user.id);
     await recipient.save();
 
@@ -93,10 +101,7 @@ export const sendFriendRequest = [
 
 // Accept friend request
 export const acceptFriendRequest = [
-  // Validation rules
   check('requesterId', 'Requester ID is required').not().isEmpty(),
-
-  // Controller logic
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -108,16 +113,23 @@ export const acceptFriendRequest = [
     const requester = await User.findById(requesterId);
 
     if (!requester) {
-      res.status(404);
-      throw new Error('User not found');
+      res.status(404).json({ message: 'User not found' });
+      return;
     }
 
     user.friends.push(requesterId);
-    user.friendRequests = user.friendRequests.filter((id) => id.toString() !== requesterId);
     requester.friends.push(req.user.id);
+
+    // Remove the requester's ID from the recipient's friendRequests array
+    user.friendRequests = user.friendRequests.filter((id) => id.toString() !== requesterId);
 
     await user.save();
     await requester.save();
+
+    await FriendRequest.findOneAndUpdate(
+      { requester: requesterId, recipient: req.user.id },
+      { status: 'accepted' }
+    );
 
     res.json({ message: 'Friend request accepted' });
   }),
@@ -125,10 +137,7 @@ export const acceptFriendRequest = [
 
 // Reject friend request
 export const rejectFriendRequest = [
-  // Validation rules
   check('requesterId', 'Requester ID is required').not().isEmpty(),
-
-  // Controller logic
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -139,13 +148,24 @@ export const rejectFriendRequest = [
     const user = await User.findById(req.user.id);
 
     if (!user) {
-      res.status(404);
-      throw new Error('User not found');
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    user.friendRequests = user.friendRequests.filter((id) => id.toString() !== requesterId);
-    await user.save();
+    await FriendRequest.findOneAndUpdate(
+      { requester: requesterId, recipient: req.user.id },
+      { status: 'rejected' }
+    );
 
     res.json({ message: 'Friend request rejected' });
   }),
 ];
+
+// Get incoming friend requests
+export const getFriendRequests = asyncHandler(async (req, res) => {
+  const friendRequests = await FriendRequest.find({
+    recipient: req.user.id,
+    status: 'pending',
+  }).populate('requester', 'firstName lastName profilePicture');
+
+  res.json(friendRequests);
+});
