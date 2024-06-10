@@ -1,8 +1,9 @@
-// src/controllers/userController.js
 import User from '../models/User.js';
 import asyncHandler from 'express-async-handler';
 import { check, validationResult } from 'express-validator';
 import FriendRequest from '../models/FriendRequest.js';
+import Post from '../models/Post.js';
+import Comment from '../models/Comment.js';
 
 // Get current user's profile
 export const getCurrentUserProfile = asyncHandler(async (req, res) => {
@@ -25,7 +26,8 @@ export const getUserProfile = asyncHandler(async (req, res) => {
 // Update user profile
 export const updateProfile = [
   // Validation rules
-  check('name', 'Name is required').optional().not().isEmpty(),
+  check('firstName', 'First name is required').optional().not().isEmpty(),
+  check('lastName', 'Last name is required').optional().not().isEmpty(),
   check('email', 'Please include a valid email').optional().isEmail(),
   check('password', 'Password must be at least 6 characters').optional().isLength({ min: 6 }),
 
@@ -36,7 +38,7 @@ export const updateProfile = [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password } = req.body;
+    const { firstName, lastName, email, password } = req.body;
     const user = await User.findById(req.user.id);
 
     if (!user) {
@@ -44,7 +46,8 @@ export const updateProfile = [
       throw new Error('User not found');
     }
 
-    user.name = name || user.name;
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
     user.email = email || user.email;
 
     if (password) {
@@ -54,7 +57,8 @@ export const updateProfile = [
     const updatedUser = await user.save();
     res.json({
       id: updatedUser.id,
-      name: updatedUser.name,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
       email: updatedUser.email,
       profilePicture: updatedUser.profilePicture,
     });
@@ -188,4 +192,28 @@ export const searchUsers = asyncHandler(async (req, res) => {
   }).select('firstName lastName email profilePicture');
 
   res.json(users);
+});
+
+// Get a user's posts
+export const getUserPosts = asyncHandler(async (req, res) => {
+  const posts = await Post.find({ author: req.params.userId });
+  res.json(posts);
+});
+
+// Get a user's friends
+export const getUserFriends = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.userId).populate(
+    'friends',
+    'firstName lastName profilePicture'
+  );
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+  res.json(user.friends);
+});
+
+// Get a user's comments
+export const getUserComments = asyncHandler(async (req, res) => {
+  const comments = await Comment.find({ author: req.params.userId });
+  res.json(comments);
 });

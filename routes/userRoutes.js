@@ -8,6 +8,9 @@ import {
   rejectFriendRequest,
   getFriendRequests,
   searchUsers,
+  getUserPosts,
+  getUserFriends,
+  getUserComments,
 } from '../controllers/userController.js';
 import auth from '../middleware/auth.js';
 
@@ -29,5 +32,10 @@ router.post('/reject-friend-request', auth, rejectFriendRequest); // Reject a fr
 router.get('/friend-requests', auth, getFriendRequests); // Get incoming friend requests
 
 router.get('/search', auth, searchUsers); // Search users
+
+// Routes to get user's posts, friends, and comments
+router.get('/profile/:userId/posts', auth, getUserPosts); // Get user's posts
+router.get('/profile/:userId/friends', auth, getUserFriends); // Get user's friends
+router.get('/profile/:userId/comments', auth, getUserComments); // Get user's comments
 
 export default router;
