@@ -1,5 +1,9 @@
+// models/User.js
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import Post from './Post.js';
+import Comment from './Comment.js';
+import FriendRequest from './FriendRequest.js';
 
 const UserSchema = new mongoose.Schema(
   {
@@ -27,6 +31,15 @@ UserSchema.pre('save', async function (next) {
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
+
+// Cascade delete middleware
+UserSchema.pre('remove', async function (next) {
+  await Post.deleteMany({ author: this._id });
+  await Comment.deleteMany({ author: this._id });
+  await FriendRequest.deleteMany({ requester: this._id });
+  await FriendRequest.deleteMany({ recipient: this._id });
+  next();
+});
 
 const User = mongoose.model('User', UserSchema);
 export default User;
