@@ -17,4 +17,13 @@ PostSchema.pre('remove', async function (next) {
   next();
 });
 
+// Virtual field for like count
+PostSchema.virtual('likeCount').get(function () {
+  return this.likes.length;
+});
+
+// Ensure virtual fields are serialized
+PostSchema.set('toJSON', { virtuals: true });
+PostSchema.set('toObject', { virtuals: true });
+
 export default mongoose.model('Post', PostSchema);
