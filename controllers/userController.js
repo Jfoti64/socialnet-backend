@@ -214,6 +214,9 @@ export const getUserFriends = asyncHandler(async (req, res) => {
 
 // Get a user's comments
 export const getUserComments = asyncHandler(async (req, res) => {
-  const comments = await Comment.find({ author: req.params.userId });
+  const comments = await Comment.find({ author: req.params.userId }).populate(
+    'author',
+    'firstName lastName profilePicture'
+  );
   res.json(comments);
 });
