@@ -29,14 +29,12 @@ describe('App Configuration', () => {
 
 describe('Middleware and Routes', () => {
   it('should use JSON middleware', async () => {
-    const res = await request(app)
-      .post('/auth/register')
-      .send({
-        firstName: 'Test',
-        lastName: 'User',
-        email: 'test@example.com',
-        password: 'password123',
-      });
+    const res = await request(app).post('/auth/register').send({
+      firstName: 'Test',
+      lastName: 'User',
+      email: 'test@example.com',
+      password: 'password123',
+    });
     expect(res.statusCode).not.toBe(500);
     expect(res.body).toHaveProperty('token');
   });
