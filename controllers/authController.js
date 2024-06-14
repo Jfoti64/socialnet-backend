@@ -1,3 +1,4 @@
+// authController.js
 import jwt from 'jsonwebtoken';
 import { check, validationResult } from 'express-validator';
 import User from '../models/User.js';
@@ -5,11 +6,10 @@ import asyncHandler from 'express-async-handler';
 import getGravatarUrl from '../utils/gravatar.js';
 
 // Utility function to generate JWT
-const generateToken = (id) => {
+export const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
-// Google OAuth callback
 export const googleCallback = (req, res) => {
   const token = generateToken(req.user.id);
   res.redirect(`${process.env.FRONTEND_URL}/auth/success?token=${token}`);
@@ -38,7 +38,7 @@ export const register = [
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(401).json({ errors: errors.array() });
     }
 
     const { firstName, lastName, email, password } = req.body;
