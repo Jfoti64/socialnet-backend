@@ -31,7 +31,7 @@ const auth = asyncHandler(async (req, res, next) => {
     next();
   } catch (err) {
     logger.error('Invalid token', { error: err.message });
-    res.status(400).send({ error: 'Invalid token' });
+    res.status(401).send({ error: 'Invalid token' });
   }
 });
 
