@@ -34,7 +34,7 @@ passport.use(
         await user.save();
         done(null, user);
       } catch (err) {
-        done(err, false, err.message);
+        done(err); // Pass the error directly to 'done'
       }
     }
   )
@@ -56,11 +56,12 @@ passport.use(
 
       return done(null, user);
     } catch (err) {
-      return done(err);
+      return done(err); // Pass the error directly to 'done'
     }
   })
 );
 
+// Serialization and Deserialization
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
@@ -70,6 +71,8 @@ passport.deserializeUser(async (id, done) => {
     const user = await User.findById(id);
     done(null, user);
   } catch (err) {
-    done(err, false, err.message);
+    done(err); // Pass the error directly to 'done'
   }
 });
+
+export default passport;
