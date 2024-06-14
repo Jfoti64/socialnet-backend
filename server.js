@@ -1,3 +1,4 @@
+// server.js or app.js
 import express from 'express';
 import mongoose from 'mongoose';
 import passport from 'passport';
@@ -6,6 +7,7 @@ import flash from 'connect-flash';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
+import errorHandler from './middleware/errorHandler.js';
 
 dotenv.config(); // Ensure this is at the very top
 
@@ -60,5 +62,8 @@ if (process.env.NODE_ENV !== 'test') {
     .then(() => console.log('MongoDB connected'))
     .catch((err) => console.error(err));
 }
+
+// Error handling middleware should be the last middleware
+app.use(errorHandler);
 
 export default app;
