@@ -11,6 +11,7 @@ import {
   getUserPosts,
   getUserFriends,
   getUserComments,
+  checkFriendRequestStatus,
 } from '../controllers/userController.js';
 import auth from '../middleware/auth.js';
 
@@ -30,6 +31,8 @@ router.post('/accept-friend-request', auth, acceptFriendRequest); // Accept a fr
 router.post('/reject-friend-request', auth, rejectFriendRequest); // Reject a friend request
 
 router.get('/friend-requests', auth, getFriendRequests); // Get incoming friend requests
+
+router.get('/friend-request-status/:requesterId/:recipientId', auth, checkFriendRequestStatus);
 
 router.get('/search', auth, searchUsers); // Search users
 

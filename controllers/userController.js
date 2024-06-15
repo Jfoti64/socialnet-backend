@@ -179,6 +179,26 @@ export const getFriendRequests = asyncHandler(async (req, res) => {
   res.json(friendRequests);
 });
 
+// Check friend request status
+export const checkFriendRequestStatus = asyncHandler(async (req, res) => {
+  const { requesterId, recipientId } = req.params;
+  const existingRequest = await FriendRequest.findOne({
+    requester: requesterId,
+    recipient: recipientId,
+  });
+
+  if (existingRequest) {
+    return res.json({ status: 'pending' });
+  }
+
+  const recipient = await User.findById(recipientId);
+  if (recipient.friends.includes(requesterId)) {
+    return res.json({ status: 'friends' });
+  }
+
+  res.json({ status: 'none' });
+});
+
 // Search users by name or email
 export const searchUsers = asyncHandler(async (req, res) => {
   const searchTerm = req.query.q;
