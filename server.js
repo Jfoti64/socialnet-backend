@@ -21,6 +21,9 @@ import postRoutes from './routes/postRoutes.js';
 
 const app = express();
 
+// Trust the first proxy
+app.set('trust proxy', 1);
+
 // Rate limiter: maximum of 30 requests per minute
 if (process.env.NODE_ENV !== 'test') {
   const limiter = RateLimit({
