@@ -1,4 +1,3 @@
-// server.js or app.js
 import express from 'express';
 import mongoose from 'mongoose';
 import passport from 'passport';
@@ -7,6 +6,8 @@ import flash from 'connect-flash';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
+import RateLimit from 'express-rate-limit';
 import errorHandler from './middleware/errorHandler.js';
 
 dotenv.config(); // Ensure this is at the very top
@@ -16,13 +17,10 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 
-const compression = require('compression');
-
 const app = express();
 
 // Set up rate limiter: maximum of 30 requests per minute
 if (process.env.NODE_ENV !== 'test') {
-  const RateLimit = require('express-rate-limit');
   const limiter = RateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: 30,
