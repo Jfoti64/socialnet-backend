@@ -16,7 +16,11 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 
+const compression = require('compression');
+
 const app = express();
+
+app.use(compression()); // Compress all routes
 
 // Middleware
 app.use(express.json());
