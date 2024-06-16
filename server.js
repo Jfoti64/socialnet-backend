@@ -8,6 +8,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import RateLimit from 'express-rate-limit';
+import MongoStore from 'connect-mongo';
 import errorHandler from './middleware/errorHandler.js';
 
 // Load environment variables
@@ -54,6 +55,7 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }), // Use MongoStore for sessions
     cookie: { secure: process.env.NODE_ENV === 'production' },
   })
 );
