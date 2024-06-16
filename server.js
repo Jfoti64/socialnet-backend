@@ -10,16 +10,18 @@ import compression from 'compression';
 import RateLimit from 'express-rate-limit';
 import errorHandler from './middleware/errorHandler.js';
 
-dotenv.config(); // Ensure this is at the very top
+// Load environment variables
+dotenv.config();
 
-import './config/passport.js'; // Ensure this is imported after dotenv.config()
+// Import configurations and routes after dotenv.config()
+import './config/passport.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 
 const app = express();
 
-// Set up rate limiter: maximum of 30 requests per minute
+// Rate limiter: maximum of 30 requests per minute
 if (process.env.NODE_ENV !== 'test') {
   const limiter = RateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
@@ -28,7 +30,7 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(limiter);
 }
 
-app.use(compression()); // Compress all routes
+app.use(compression());
 
 // Middleware
 app.use(express.json());
@@ -36,10 +38,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL, // Update this to your frontend's origin
-  credentials: true, // Allow credentials
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
 };
-
 app.use(cors(corsOptions));
 
 // Helmet configuration
@@ -50,7 +51,7 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production' }, // Ensure cookies are secure in production
+    cookie: { secure: process.env.NODE_ENV === 'production' },
   })
 );
 app.use(flash());
