@@ -1,4 +1,3 @@
-```markdown
 # SocialNet Backend
 
 SocialNet is a social networking platform. This repository contains the backend code built with Node.js, Express, and MongoDB.
@@ -165,4 +164,3 @@ If you have any questions or suggestions, feel free to reach out to me at Joshua
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
-```
