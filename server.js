@@ -25,11 +25,11 @@ const app = express();
 // Trust the first proxy
 app.set('trust proxy', 1);
 
-// Rate limiter: maximum of 30 requests per minute
+// Rate limiter: maximum of 1000 requests per minute for development
 if (process.env.NODE_ENV !== 'test') {
   const limiter = RateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
-    max: 30,
+    max: process.env.NODE_ENV === 'development' ? 1000 : 30,
   });
   app.use(limiter);
 }
