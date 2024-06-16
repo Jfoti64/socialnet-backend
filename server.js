@@ -42,7 +42,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL,
+  origin: process.env.FRONTEND_URL.trim().replace(/\/$/, ''), // Ensure no trailing slash
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -71,6 +71,11 @@ app.use('/posts', postRoutes);
 // Basic route
 app.get('/', (req, res) => {
   res.send('Welcome to SocialNet API');
+});
+
+// Test CORS route
+app.get('/test-cors', (req, res) => {
+  res.json({ message: 'CORS is working!' });
 });
 
 // Connect to MongoDB
