@@ -29,7 +29,7 @@ app.set('trust proxy', 1);
 if (process.env.NODE_ENV !== 'test') {
   const limiter = RateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
-    max: process.env.NODE_ENV === 'development' ? 1000 : 30,
+    max: process.env.NODE_ENV === 'development' ? 2000 : 1000,
   });
   app.use(limiter);
 }
