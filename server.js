@@ -20,6 +20,14 @@ const compression = require('compression');
 
 const app = express();
 
+// Set up rate limiter: maximum of 30 requests per minute
+const RateLimit = require('express-rate-limit');
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 30,
+});
+app.use(limiter);
+
 app.use(compression()); // Compress all routes
 
 // Middleware
