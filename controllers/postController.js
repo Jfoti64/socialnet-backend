@@ -104,6 +104,7 @@ export const updatePost = [
 
 // Delete a post
 export const deletePost = asyncHandler(async (req, res) => {
+  console.log('Delete post request received for ID:', req.params.id);
   const post = await Post.findById(req.params.id);
   if (!post) {
     return res.status(404).json({ message: 'Post not found' });
@@ -111,7 +112,7 @@ export const deletePost = asyncHandler(async (req, res) => {
   if (post.author.toString() !== req.user.id) {
     return res.status(403).json({ message: 'User not authorized' });
   }
-  await Post.deleteOne({ _id: req.params.id });
+  await Post.findByIdAndDelete(req.params.id);
   res.json({ message: 'Post removed' });
 });
 
